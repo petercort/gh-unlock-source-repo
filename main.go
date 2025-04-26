@@ -2,25 +2,65 @@ package main
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/cli/go-gh/v2/pkg/api"
+	"github.com/robandpdx/gh-unlock-repo/pkg/logger"
+
+	"go.uber.org/zap"
+
+	"github.com/robandpdx/gh-unlock-repo/cmd"
+	"github.com/spf13/cobra"
 )
 
 func main() {
-	fmt.Println("hi world, this is the gh-unlock-repo extension!")
-	client, err := api.DefaultRESTClient()
-	if err != nil {
-		fmt.Println(err)
-		return
+	var rootCmd = &cobra.Command{
+		Use:   "gh-unlock-repo --org <org> --repo <repo>",
+		Short: "GitHub GitLab Migration Tool",
+		RunE: func(cmdCobra *cobra.Command, args []string) error {
+			return cmd.UnlockRepo().RunE(cmdCobra, args)
+		},
 	}
-	response := struct {Login string}{}
-	err = client.Get("user", &response)
-	if err != nil {
-		fmt.Println(err)
-		return
+
+	rootCmd.Flags().StringP("org", "o", "", "GitHub organization")
+	rootCmd.Flags().StringP("repo", "r", "", "GitHub repository")
+
+	errFile := rootCmd.MarkFlagRequired("org")
+	if errFile != nil {
+		logger.Logger.Error("failed to mark flag as required", zap.Error(errFile))
 	}
-	fmt.Printf("running as %s\n", response.Login)
+	errFile = rootCmd.MarkFlagRequired("repo")
+	if errFile != nil {
+		logger.Logger.Error("failed to mark flag as required", zap.Error(errFile))
+	}
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(1)
+	}
 }
 
-// For more examples of using go-gh, see:
-// https://github.com/cli/go-gh/blob/trunk/example_gh_test.go
+func init() {
+	logger.InitLogger()
+	defer logger.SyncLogger()
+
+	required := []struct {
+		name  string
+		value string
+	}{
+		{"GITHUB_TOKEN", os.Getenv("GITHUB_TOKEN")},
+	}
+
+	var missing []string
+
+	for _, r := range required {
+		if r.value == "" {
+			missing = append(missing, r.name)
+		}
+	}
+
+	if len(missing) > 0 {
+		logger.Logger.Error("Missing required environment variables",
+			zap.Strings("missing", missing))
+		os.Exit(1)
+	}
+}
