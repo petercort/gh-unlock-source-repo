@@ -15,9 +15,8 @@ import (
 )
 
 func UnlockRepo(input UnlockRepoInput) (*UnlockRepoResponse, error) {
-	ghlog.Logger.Info("Unlocking repository",
-		zap.String("orgName", input.OrgName),
-		zap.String("repoName", input.RepoName))
+	ghlog.Logger.Info("Unlocking repositories",
+		zap.String("migrationId", input.MigrationId))
 
 	// Get environment variables
 	githubToken := os.Getenv("GITHUB_TOKEN")
@@ -38,14 +37,10 @@ func UnlockRepo(input UnlockRepoInput) (*UnlockRepoResponse, error) {
 	mutation := `
 	mutation unlockImportedRepositories(
 			$migrationId: ID!
-			$org: String!
-			$repo: String!
 	) {
 			unlockImportedRepositories(
 					input: {
-						migrationId: $migrationId,
-						org:         "${input.OrgName}",
-						repo:        "${input.RepoName}"
+						migrationId: $migrationId
 					}
 			) {
 					migration {
@@ -63,8 +58,6 @@ func UnlockRepo(input UnlockRepoInput) (*UnlockRepoResponse, error) {
 		"query": mutation,
 		"variables": map[string]interface{}{
 			"migrationId": input.MigrationId,
-			"org":         input.OrgName,
-			"repo":        input.RepoName,
 		},
 		"operationName": "unlockImportedRepositories",
 	}
@@ -157,4 +150,108 @@ func UnlockRepo(input UnlockRepoInput) (*UnlockRepoResponse, error) {
 		zap.String("statusCode", fmt.Sprintf("%d", response.Data.StatusCode)))
 
 	return &response.Data, nil
+}
+
+// write a new function that calls the list organization migrations
+// endoiint (https://docs.github.com/en/rest/migrations/orgs?apiVersion=2022-11-28#list-organization-migrations)
+// for the org and finds the repo in a migration and returns the migration id
+func GetMigrationId(orgName string, repoName string) (string, error) {
+	ghlog.Logger.Info("Getting migration ID",
+		zap.String("orgName", orgName),
+		zap.String("repoName", repoName))
+
+	// Get environment variables
+	githubToken := os.Getenv("GITHUB_TOKEN")
+	githubHost := os.Getenv("GITHUB_API_ENDPOINT")
+
+	if githubHost == "" {
+		githubHost = "api.github.com"
+	}
+
+	// Initialize GitHub client with proper headers
+	githubClient := clients.NewGitHubClient(githubToken)
+	client, err := githubClient.GitHubAuth()
+
+	if err != nil {
+		return "", fmt.Errorf("failed to create GitHub client: %v", err)
+	}
+
+	url := fmt.Sprintf("https://%s/orgs/%s/migrations", githubHost, orgName)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create HTTP request: %v", err)
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", githubToken))
+	req.Header.Set("Accept", "application/vnd.github.v3+json")
+
+	resp, err := client.Client().Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to make GraphQL request: %v", err)
+	}
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			ghlog.Logger.Error("failed to close response body", zap.Error(err))
+		}
+	}()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	ghlog.Logger.Debug("Raw response", zap.String("body", string(body)))
+
+	// Corrected struct to match the actual JSON response structure
+	type Migration struct {
+		Id    int64 `json:"id"`
+		Owner struct {
+			Login string `json:"login"`
+		} `json:"owner"`
+		Guid             string `json:"guid"`
+		State            string `json:"state"`
+		LockRepositories bool   `json:"lock_repositories"`
+		Repositories     []struct {
+			Id       int64  `json:"id"`
+			NodeId   string `json:"node_id"`
+			Name     string `json:"name"`
+			FullName string `json:"full_name"`
+			Owner    struct {
+				Login string `json:"login"`
+			} `json:"owner"`
+		} `json:"repositories"`
+	}
+
+	// Since the response is a top-level array, directly unmarshal into a slice
+	var migrations []Migration
+	// Unmarshal the response body into the struct
+	// if the response is not 200, show error message
+	// and the response body and return an error
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected response status: %d, body: %s", resp.StatusCode, string(body))
+	}
+
+	if err := json.Unmarshal(body, &migrations); err != nil {
+		ghlog.Logger.Error("Failed to decode response", zap.Error(err))
+		return "", fmt.Errorf("failed to decode response: %v", err)
+	}
+
+	// Check if the response contains any errors
+	if len(migrations) == 0 {
+		return "", fmt.Errorf("no migrations found for org: %s", orgName)
+	}
+
+	// Loop through the migrations and find the one that contains the repo
+	for _, migration := range migrations {
+		for _, repo := range migration.Repositories {
+			if repo.FullName == fmt.Sprintf("%s/%s", orgName, repoName) {
+				return fmt.Sprintf("%d", migration.Id), nil
+			}
+		}
+	}
+
+	// no migration found for the repo, return an error
+	return "", fmt.Errorf("no migration found for repo: %s/%s", orgName, repoName)
 }
