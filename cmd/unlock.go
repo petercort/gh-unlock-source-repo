@@ -6,13 +6,13 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
-	"github.com/robandpdx/gh-unlock-repo/internal/clients/github"
-	ghlog "github.com/robandpdx/gh-unlock-repo/pkg/logger"
+	"github.com/robandpdx/gh-unlock-source-repo/internal/clients/github"
+	ghlog "github.com/robandpdx/gh-unlock-source-repo/pkg/logger"
 )
 
 func UnlockRepo() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "gh-unlock-repo --org <org-name> --repo <repo-name>",
+		Use:   "gh-unlock-source-repo --org <org-name> --repo <repo-name>",
 		Short: "Unlock a repository in GitHub",
 		Long:  `Unlock the specified repository in GitHub.`,
 

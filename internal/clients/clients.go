@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/go-github/v69/github"
 
-	"github.com/robandpdx/gh-unlock-repo/pkg/logger"
+	"github.com/robandpdx/gh-unlock-source-repo/pkg/logger"
 )
 
 type GitHubClient interface {

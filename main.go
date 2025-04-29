@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/robandpdx/gh-unlock-repo/pkg/logger"
+	"github.com/robandpdx/gh-unlock-source-repo/pkg/logger"
 
 	"go.uber.org/zap"
 
-	"github.com/robandpdx/gh-unlock-repo/cmd"
+	"github.com/robandpdx/gh-unlock-source-repo/cmd"
 	"github.com/spf13/cobra"
 )
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:   "gh-unlock-repo --org <org> --repo <repo>",
+		Use:   "gh-unlock-source-repo --org <org> --repo <repo>",
 		Short: "GitHub GitLab Migration Tool",
 		RunE: func(cmdCobra *cobra.Command, args []string) error {
 			return cmd.UnlockRepo().RunE(cmdCobra, args)

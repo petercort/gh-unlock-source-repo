@@ -1,4 +1,4 @@
-module github.com/robandpdx/gh-unlock-repo
+module github.com/robandpdx/gh-unlock-source-repo
 
 go 1.24.2
 

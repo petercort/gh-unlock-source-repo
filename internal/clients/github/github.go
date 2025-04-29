@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/robandpdx/gh-unlock-repo/internal/clients"
-	ghlog "github.com/robandpdx/gh-unlock-repo/pkg/logger"
+	"github.com/robandpdx/gh-unlock-source-repo/internal/clients"
+	ghlog "github.com/robandpdx/gh-unlock-source-repo/pkg/logger"
 
 	"go.uber.org/zap"
 )
