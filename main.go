@@ -47,7 +47,7 @@ func init() {
 		name  string
 		value string
 	}{
-		{"GITHUB_TOKEN", os.Getenv("GITHUB_TOKEN")},
+		{"GH_SOURCE_PAT", os.Getenv("GH_SOURCE_PAT")},
 	}
 
 	var missing []string

@@ -24,8 +24,8 @@ func NewGitHubClient(pat string) GitHubClient {
 
 func (g *GitHubClientImpl) GitHubAuth() (*github.Client, error) {
 	if g.githubPAT == "" {
-		logger.Logger.Error("GITHUB_TOKEN is not set")
-		return nil, fmt.Errorf("GITHUB_TOKEN environment variable is not set")
+		logger.Logger.Error("GH_SOURCE_PAT is not set")
+		return nil, fmt.Errorf("GH_SOURCE_PAT environment variable is not set")
 	}
 	client := github.NewClient(nil).WithAuthToken(g.githubPAT)
 	if client == nil {

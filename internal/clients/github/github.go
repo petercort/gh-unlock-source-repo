@@ -15,7 +15,7 @@ import (
 
 func UnlockRepo(input UnlockRepoInput) (*UnlockRepoResponse, error) {
 	// Get environment variables
-	githubToken := os.Getenv("GITHUB_TOKEN")
+	githubToken := os.Getenv("GH_SOURCE_PAT")
 	githubHost := os.Getenv("GITHUB_API_ENDPOINT")
 
 	if githubHost == "" {
@@ -67,7 +67,7 @@ func UnlockRepo(input UnlockRepoInput) (*UnlockRepoResponse, error) {
 
 func GetMigrationId(orgName string, repoName string) (string, error) {
 	// Get environment variables
-	githubToken := os.Getenv("GITHUB_TOKEN")
+	githubToken := os.Getenv("GH_SOURCE_PAT")
 	githubHost := os.Getenv("GITHUB_API_ENDPOINT")
 
 	if githubHost == "" {
