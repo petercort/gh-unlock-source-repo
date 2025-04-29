@@ -1,33 +1,18 @@
-# Unlock Repository
+# Unlock Source Repository GitHub CLI Extension
 
-This github cli extension is meant to unlock a repository after a migration.
+This [GitHub CLI](https://cli.github.com/) extension is meant to unlock a migration source repository that was [locked by GitHub Enterpise Importer during a migration](https://docs.github.com/en/migrations/overview/about-locked-repositories#repositories-locked-by-github-enterprise-importer). 
+## Installation
+```bash
+gh extension install robandpdx/gh-unlock-source-repo
+```
 
+## Usage
+```bash
+export GH_SOURCE_PAT="<token>"
+gh unlock-source repo --org <org> --repo <repository>
+```
 
-## Notes
-
-[List migrations API](https://docs.github.com/en/rest/migrations/orgs?apiVersion=2022-11-28#list-organization-migrations)  
-[Unlock an organization repository](https://docs.github.com/en/rest/migrations/orgs?apiVersion=2022-11-28#unlock-an-organization-repository)  
-
-https://docs.github.com/en/migrations/overview/about-locked-repositories  
-https://github.github.com/enterprise-migrations/#/3.1.2-import-using-graphql-api?id=unlock-imported-repositories  
-
-
-https://docs.github.com/en/rest/migrations/orgs?apiVersion=2022-11-28  
-
-```json
-{
-  "data": {
-    "unlockImportedRepositories": {
-      "migration": {
-        "guid": "805e4f0e-325a-49e9-9abd-2ac90a615732",
-        "state": "UNLOCKED"
-      },
-      "unlockedRepositories": [
-        {
-          "nameWithOwner": "import-test/widgets"
-        }
-      ]
-    }
-  }
-}
+## Example
+```bash
+gh unlock-source-repo --org mindfulrob --repo java-private-library
 ```
