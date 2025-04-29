@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strconv"
+
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
@@ -37,7 +39,10 @@ func unlockRepo(cmd *cobra.Command, args []string) error {
 	}
 
 	// Get the migation ID
-	ghlog.Logger.Info("Getting migration ID")
+	ghlog.Logger.Info("Getting migration ID",
+		zap.String("org", org),
+		zap.String("repo", repo),
+	)
 	migrationId, err := github.GetMigrationId(org, repo)
 	if err != nil {
 		ghlog.Logger.Error("failed to get migration ID", zap.Error(err))
@@ -59,8 +64,9 @@ func unlockRepo(cmd *cobra.Command, args []string) error {
 
 	response, err := github.UnlockRepo(input)
 
-	// log the satus code
-	ghlog.Logger.Info("Unlocking repository status code", zap.Int("statusCode", response.StatusCode))
+	ghlog.Logger.Info("Successfully unlocked repository",
+		zap.String("statusCode", strconv.Itoa(response.StatusCode)),
+	)
 
 	return nil
 }
