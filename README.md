@@ -9,7 +9,7 @@ gh extension install robandpdx/gh-unlock-source-repo
 ## Usage
 ```bash
 export GH_SOURCE_PAT="<token>"
-gh unlock-source repo --org <org> --repo <repository>
+gh unlock-source-repo --org <org> --repo <repository>
 ```
 
 ## Example
