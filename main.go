@@ -14,15 +14,17 @@ import (
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:   "gh-unlock-source-repo --org <org> --repo <repo>",
-		Short: "GitHub GitLab Migration Tool",
+		Use:     "gh-unlock-source-repo --org <org-name> --repo <repo-name>",
+		Short:   "Unlock a repository in GitHub",
+		Long:    `Unlock the specified migration source repository in GitHub.`,
+		Example: `  gh-unlock-source-repo --org my-org --repo my-repo`,
 		RunE: func(cmdCobra *cobra.Command, args []string) error {
 			return cmd.UnlockRepo().RunE(cmdCobra, args)
 		},
 	}
 
-	rootCmd.Flags().StringP("org", "o", "", "GitHub organization")
-	rootCmd.Flags().StringP("repo", "r", "", "GitHub repository")
+	rootCmd.Flags().StringP("org", "o", "", "GitHub organization name")
+	rootCmd.Flags().StringP("repo", "r", "", "GitHub repository name")
 
 	errFile := rootCmd.MarkFlagRequired("org")
 	if errFile != nil {

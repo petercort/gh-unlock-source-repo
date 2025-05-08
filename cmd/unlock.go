@@ -12,12 +12,7 @@ import (
 
 func UnlockRepo() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "gh-unlock-source-repo --org <org-name> --repo <repo-name>",
-		Short: "Unlock a repository in GitHub",
-		Long:  `Unlock the specified repository in GitHub.`,
-
-		Example: `  gh glx unlock-repo --org my-org --repo my-repo`,
-		RunE:    unlockRepo,
+		RunE: unlockRepo,
 	}
 
 	return cmd
