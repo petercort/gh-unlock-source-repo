@@ -9,7 +9,7 @@ gh extension install robandpdx/gh-unlock-source-repo
 ## Usage
 ```bash
 export GH_SOURCE_PAT="<token>"
-export GITHUB_API_ENDPOINT="<ghes api endpoint | https://myghes.com/api/v3>" # required if using GHES 
+export GITHUB_API_ENDPOINT="<ghes_api_endpoint>" # required if using GHES, ommit https, include /api/v3 eg: myghes.com/api/v3
 gh unlock-source-repo --org <org> --repo <repository>
 ```
 
@@ -17,3 +17,8 @@ gh unlock-source-repo --org <org> --repo <repository>
 ```bash
 gh unlock-source-repo --org mindfulrob --repo java-private-library
 ```
+
+## GHES Example 
+```bash
+export 
+gh unlock-source-repo  --org the-nba --repo game-time 
