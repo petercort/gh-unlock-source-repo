@@ -9,6 +9,7 @@ gh extension install robandpdx/gh-unlock-source-repo
 ## Usage
 ```bash
 export GH_SOURCE_PAT="<token>"
+export GITHUB_API_ENDPOINT="https://myghes.com/api/v3" # if using GHES 
 gh unlock-source-repo --org <org> --repo <repository>
 ```
 
