@@ -17,8 +17,3 @@ gh unlock-source-repo --org <org> --repo <repository>
 ```bash
 gh unlock-source-repo --org mindfulrob --repo java-private-library
 ```
-
-## GHES Example 
-```bash
-export 
-gh unlock-source-repo  --org the-nba --repo game-time 
